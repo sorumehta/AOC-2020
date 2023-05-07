@@ -1,5 +1,6 @@
 import argparse
 import os.path
+from functools import reduce
 from typing import NamedTuple
 import collections
 import pytest
@@ -32,15 +33,9 @@ def parse_input(s: str):
 
 
 def dfs(graph: collections.defaultdict[str, list[BagInfo]],
-        node: str, visited: dict[str, bool]) -> int:
-
-    acc_return = 0
-    for child in graph[node]:
-        # and count its children
-        num_childs_of_child = child.num * dfs(graph, child.col, visited)
-        acc_return += (num_childs_of_child + child.num )
-    visited[node] = True
-    return acc_return
+        node: str) -> int:
+    return reduce(lambda acc, child: acc + child.num + child.num * dfs(graph, child.col),
+                  graph[node], 0)
 
 
 def compute(s: str) -> int:
@@ -49,7 +44,7 @@ def compute(s: str) -> int:
     for col in colors:
         visited[col] = False
     start = 'shiny gold'
-    n_outermost_parents = dfs(parents, start, visited)
+    n_outermost_parents = dfs(parents, start)
     return n_outermost_parents
 
 
